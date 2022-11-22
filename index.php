@@ -133,6 +133,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     $val_text_err_err = "Verification Failed.";
                 }
             }
+            } else{}
             } else{
                 echo "Oops! Something went wrong. Please try again later.";
             }
