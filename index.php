@@ -2,7 +2,6 @@
 <?php
 // Initialize the session
 include('dbconnect.php'); 
-
 // Define variables and initialize with empty values
 $username = $password = $loggedin = $type= $profile_img = "";
 $username_err = $password_err = "";
@@ -18,6 +17,10 @@ if(!empty($_COOKIE["usernamecookie"]) && !empty($_COOKIE["passwordcookie"]) && i
     ;
 }
 
+
+
+$qury = mysqli_query($mysqli, "SELECT * FROM var_image ORDER BY RAND() LIMIT 1");
+$result = mysqli_fetch_array($qury);
 
 // Processing form data when form is submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -126,6 +129,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Close connection
     $mysqli->close();
 }
+
 ?>
 <html lang="en">
 <head>
@@ -143,7 +147,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 </div>
                 <form method = 'POST' action = 'index.php' >
                     <div class="form-group">
-
                         <label>Username/Login id : </label>
                         <br>
                         <div> 
@@ -162,10 +165,24 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             <input type="checkbox" name="auto_sign_in"><label>Auto Sign in</label>
                         </div>
                         <br>
+                        <div>
+                        <img src="<?php echo $result['img_url'];?>" width="100" height="60"><br>
+                        <input name="check_val" type="text" value="<?php echo $result['img_val'];?>" hidden="yes">
+                        <input name="val_text" type="text" required autocomplete="off" maxlength="4">
+                        <br><br>
+
+                        </div>
                     </div>
 
                     <button class="btn" type="submit" name="login" value='login'>Login</button>
                 </form>
+                <?php
+                if(isset($_POST['login'])){
+                    if($_POST['check_val']==$_POST['val_text']){
+                        echo "OK";
+                    }else{echo "Verification Failed";}
+                }
+                ?>
                 <div id="footer-box">
                     <p>Register to be our member? <a href="register.php" class="sign-up">Sign up now</a></p>
                 </div>
