@@ -4,7 +4,7 @@
 include('dbconnect.php'); 
 // Define variables and initialize with empty values
 $username = $password = $loggedin = $type= $profile_img = "";
-$username_err = $password_err = "";
+$username_err = $password_err = $val_text_err = "";
 if(!empty($_COOKIE["usernamecookie"]) && !empty($_COOKIE["passwordcookie"]) && isset($_COOKIE["auto_sign_in"])){
     // Redirect user to welcome page
     if($_COOKIE["type"] == "Company"){
@@ -39,9 +39,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     } else{
         $password = trim($_POST["password"]);
     }
+
+    // Check if password is empty
+    if(empty(trim($_POST["password"]))){
+        $val_text_err = "Please input token.";
+    }
+
+    
+    
     
     // Validate credentials
-    if(empty($username_err) && empty($password_err)){
+    if(empty($username_err) && empty($password_err) && empty($val_text_err)){
         // Prepare a select statement
         $sql = "SELECT uid, username, password, type, profile_img FROM users WHERE username = ?";
         
@@ -57,6 +65,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 // Store result
                 $stmt->store_result();
                 
+                //CHECK Token
+                if(isset($_POST['login'])){
+                    if($_POST['check_val']==$_POST['val_text']){
+
                 // Check if username exists, if yes then verify password
                 if($stmt->num_rows == 1){                    
                     // Bind result variables
@@ -115,7 +127,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 } else{
                     // Display an error message if username doesn't exist
                     $username_err = "No account found with that username.";
+                } 
+                else{
+                    // Display an error message if token wrong
+                    $val_text_err_err = "Verification Failed.";
                 }
+            }
             } else{
                 echo "Oops! Something went wrong. Please try again later.";
             }
@@ -169,6 +186,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         <img src="<?php echo $result['img_url'];?>" width="100" height="60"><br>
                         <input name="check_val" type="text" value="<?php echo $result['img_val'];?>" hidden="yes">
                         <input name="val_text" type="text" required autocomplete="off" maxlength="4">
+                        <span class="err"><?php echo $val_text_err; ?></span>
                         <br><br>
 
                         </div>
@@ -176,13 +194,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                     <button class="btn" type="submit" name="login" value='login'>Login</button>
                 </form>
-                <?php
-                if(isset($_POST['login'])){
-                    if($_POST['check_val']==$_POST['val_text']){
-                        echo "OK";
-                    }else{echo "Verification Failed";}
-                }
-                ?>
                 <div id="footer-box">
                     <p>Register to be our member? <a href="register.php" class="sign-up">Sign up now</a></p>
                 </div>
